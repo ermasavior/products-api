@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -36,8 +37,6 @@ func buildHTTPRequestBody(c echo.Context, method, path string, bodyRequest inter
 }
 
 func TestGetProduct(t *testing.T) {
-	method, path := http.MethodGet, "/products/1"
-
 	ctrl := gomock.NewController(t)
 	mockUC := usecase.NewMockUsecaseInterface(ctrl)
 
@@ -50,6 +49,8 @@ func TestGetProduct(t *testing.T) {
 		variant     = ""
 		price       = float32(10000)
 		stock       = 10
+
+		method, path = http.MethodGet, fmt.Sprintf("/products/%d", productID)
 	)
 
 	type args struct {
@@ -290,6 +291,150 @@ func TestAddProduct(t *testing.T) {
 			s.AddProduct(c)
 
 			var got generated.AddProductResponse
+			sonic.Unmarshal(rec.Body.Bytes(), &got)
+
+			assert.EqualValues(t, tt.wantStatusCode, rec.Code)
+			assert.EqualValues(t, tt.wantRes, got)
+		})
+	}
+}
+
+func TestUpdateProduct(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUC := usecase.NewMockUsecaseInterface(ctrl)
+
+	var (
+		productID   = 1
+		name        = "Dummy"
+		description = "Test description"
+		rating      = float32(4.5)
+		varietyID   = 9
+		variant     = ""
+		price       = float32(10000)
+		stock       = 10
+
+		invalidMsg = "invalid msg"
+		emptyStr   = ""
+
+		method, path = http.MethodPatch, fmt.Sprintf("/products/%d", productID)
+	)
+
+	validReq := generated.Product{
+		Name:        name,
+		Description: description,
+		Rating:      &rating,
+		Details: []generated.ProductDetail{
+			{
+				VarietyId: &varietyID,
+				Variant:   &variant,
+				Price:     price,
+				Stock:     stock,
+			},
+		},
+	}
+
+	productInput := model.Product{
+		ProductID:   productID,
+		Name:        name,
+		Description: description,
+		Rating:      rating,
+		Details: []model.ProductVariety{
+			{
+				VarietyID: varietyID,
+				Variant:   variant,
+				Price:     price,
+				Stock:     stock,
+			},
+		},
+	}
+
+	type args struct {
+		req generated.UpdateProductRequest
+	}
+	tests := []struct {
+		name           string
+		args           args
+		mockFunc       func()
+		wantStatusCode int
+		wantRes        generated.UpdateProductResponse
+	}{
+		{
+			name: "success",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
+					Return(model.ValidationProductResult{
+						IsValid: true,
+					}, nil).Times(1)
+			},
+			wantStatusCode: http.StatusOK,
+			wantRes: generated.UpdateProductResponse{
+				Success: true,
+			},
+		},
+		{
+			name: "failed - error validation",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
+					Return(model.ValidationProductResult{
+						IsValid: false,
+						Name:    invalidMsg,
+						Details: &model.ValidationProductDetailResult{
+							Stock: invalidMsg,
+						},
+					}, nil).Times(1)
+			},
+			wantStatusCode: http.StatusBadRequest,
+			wantRes: generated.UpdateProductResponse{
+				Success: false,
+				Validation: &generated.ValidationProductResult{
+					Name:        &invalidMsg,
+					Description: &emptyStr,
+					Details: &generated.ValidationProductDetailResult{
+						Stock: &invalidMsg,
+						Price: &emptyStr,
+					},
+				},
+			},
+		},
+		{
+			name: "failed - error from usecase",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
+					Return(model.ValidationProductResult{}, errors.New("error usecase")).Times(1)
+			},
+			wantStatusCode: http.StatusInternalServerError,
+			wantRes: generated.UpdateProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: "error usecase",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := Server{
+				Usecase: mockUC,
+			}
+			if tt.mockFunc != nil {
+				tt.mockFunc()
+			}
+
+			rec, c := initHTTPCall(method, path)
+			c = buildHTTPRequestBody(c, method, path, tt.args.req)
+			s.UpdateProduct(c, productID)
+
+			var got generated.UpdateProductResponse
 			sonic.Unmarshal(rec.Body.Bytes(), &got)
 
 			assert.EqualValues(t, tt.wantStatusCode, rec.Code)

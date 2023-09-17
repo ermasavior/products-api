@@ -37,6 +37,20 @@ func (m *MockRepositoryInterface) EXPECT() *MockRepositoryInterfaceMockRecorder 
 	return m.recorder
 }
 
+// DeleteProductVariety mocks base method.
+func (m *MockRepositoryInterface) DeleteProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProductVariety", ctx, variety, tx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteProductVariety indicates an expected call of DeleteProductVariety.
+func (mr *MockRepositoryInterfaceMockRecorder) DeleteProductVariety(ctx, variety, tx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProductVariety", reflect.TypeOf((*MockRepositoryInterface)(nil).DeleteProductVariety), ctx, variety, tx)
+}
+
 // GetDatabase mocks base method.
 func (m *MockRepositoryInterface) GetDatabase() *sql.DB {
 	m.ctrl.T.Helper()
@@ -96,16 +110,44 @@ func (mr *MockRepositoryInterfaceMockRecorder) InsertProduct(ctx, product, tx in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertProduct", reflect.TypeOf((*MockRepositoryInterface)(nil).InsertProduct), ctx, product, tx)
 }
 
-// InsertProductVarieties mocks base method.
-func (m *MockRepositoryInterface) InsertProductVarieties(ctx context.Context, productID int, varieties []model.ProductVariety, tx sqlwrapper.Transaction) error {
+// InsertProductVariety mocks base method.
+func (m *MockRepositoryInterface) InsertProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertProductVarieties", ctx, productID, varieties, tx)
+	ret := m.ctrl.Call(m, "InsertProductVariety", ctx, variety, tx)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// InsertProductVarieties indicates an expected call of InsertProductVarieties.
-func (mr *MockRepositoryInterfaceMockRecorder) InsertProductVarieties(ctx, productID, varieties, tx interface{}) *gomock.Call {
+// InsertProductVariety indicates an expected call of InsertProductVariety.
+func (mr *MockRepositoryInterfaceMockRecorder) InsertProductVariety(ctx, variety, tx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertProductVarieties", reflect.TypeOf((*MockRepositoryInterface)(nil).InsertProductVarieties), ctx, productID, varieties, tx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertProductVariety", reflect.TypeOf((*MockRepositoryInterface)(nil).InsertProductVariety), ctx, variety, tx)
+}
+
+// UpdateProduct mocks base method.
+func (m *MockRepositoryInterface) UpdateProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProduct", ctx, product, tx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateProduct indicates an expected call of UpdateProduct.
+func (mr *MockRepositoryInterfaceMockRecorder) UpdateProduct(ctx, product, tx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProduct", reflect.TypeOf((*MockRepositoryInterface)(nil).UpdateProduct), ctx, product, tx)
+}
+
+// UpdateProductVariety mocks base method.
+func (m *MockRepositoryInterface) UpdateProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProductVariety", ctx, variety, tx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateProductVariety indicates an expected call of UpdateProductVariety.
+func (mr *MockRepositoryInterfaceMockRecorder) UpdateProductVariety(ctx, variety, tx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProductVariety", reflect.TypeOf((*MockRepositoryInterface)(nil).UpdateProductVariety), ctx, variety, tx)
 }

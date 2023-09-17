@@ -15,6 +15,7 @@ type ProductVariety struct {
 	Variant   string  `db:"variant"`
 	Price     float32 `validate:"required" db:"price"`
 	Stock     int     `validate:"required" db:"stock"`
+	ProductID int
 }
 
 type ValidationProductResult struct {

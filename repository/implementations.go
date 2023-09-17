@@ -74,14 +74,45 @@ func (r *Repository) InsertProduct(ctx context.Context, product model.Product, t
 	return id, err
 }
 
-func (r *Repository) InsertProductVarieties(ctx context.Context, productID int, varieties []model.ProductVariety, tx sqlwrapper.Transaction) error {
-	for _, v := range varieties {
-		_, err := tx.ExecContext(ctx, queryInsertNewProductVariety,
-			productID, v.Variant, v.Price, v.Stock)
+func (r *Repository) InsertProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
+	_, err := tx.ExecContext(ctx, queryInsertNewProductVariety,
+		variety.ProductID, variety.Variant, variety.Price, variety.Stock)
 
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) error {
+	_, err := tx.ExecContext(ctx, queryUpdateProduct,
+		product.Name, product.Description, product.Rating, product.ProductID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
+	_, err := tx.ExecContext(ctx, queryUpdateProductVariety,
+		variety.Variant, variety.Price, variety.Stock, variety.VarietyID, variety.ProductID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) DeleteProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
+	_, err := tx.ExecContext(ctx, queryDeleteProductVariety,
+		variety.VarietyID, variety.ProductID)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -15,5 +15,9 @@ type RepositoryInterface interface {
 	GetProductVarietiesByProductID(ctx context.Context, productID int) ([]model.ProductVariety, error)
 
 	InsertProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) (int, error)
-	InsertProductVarieties(ctx context.Context, productID int, varieties []model.ProductVariety, tx sqlwrapper.Transaction) error
+	InsertProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error
+
+	UpdateProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) error
+	UpdateProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error
+	DeleteProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error
 }
