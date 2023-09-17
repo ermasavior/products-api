@@ -1,44 +1,192 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: User Service
+  title: Products API
   license:
     name: MIT
 servers:
   - url: http://localhost
 paths:
-  /hello:
+  /products/{productID}:
     get:
-      summary: This is just a test endpoint to get you started. Please delete this endpoint.
-      operationId: hello
+      summary: Get product detail by id
+      operationId: getProduct
       parameters:
-        - name: id
-          in: query
-          required: true
+        - in: path
+          name: productID
           schema:
             type: integer
+          required: true
+          description: Numeric ID of the product to get
       responses:
         "200":
-          description: Test return
+          description: Returns product data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HelloResponse"
+                $ref: "#/components/schemas/GetProductResponse"
         "404":
           description: Not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/GetProductResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProductResponse"
+    patch:
+      summary: Update product data
+      operationId: updateProduct
+      parameters:
+        - in: path
+          name: productID
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductRequest"
+      responses:
+        "200":
+          description: Update product response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProductResponse"
+        "400":
+          description: Invalid params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProductResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateProductResponse"
+  /products:
+    post:
+      summary: Add a new product
+      operationId: addProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddProductRequest"
+      responses:
+        "200":
+          description: Add product response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddProductResponse"
+        "400":
+          description: Invalid params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddProductResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddProductResponse"
 components:
   schemas:
-    HelloResponse:
+    AddProductRequest:
+      $ref: "#/components/schemas/Product"
+    AddProductResponse:
       type: object
       required:
-        - message
+        - success
       properties:
-        message:
+        success:
+          type: boolean
+        error:
+          $ref: "#/components/schemas/ErrorResponse"
+        validation:
+          $ref: "#/components/schemas/ValidationResult"
+    ValidationResult:
+      type: object
+      properties:
+        name:
           type: string
+        description:
+          type: string
+        rating:
+          type: string
+        details:
+          type: object
+          properties:
+            price:
+              type: string
+            stock:
+              type: string
+    GetProductResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        error:
+          $ref: "#/components/schemas/ErrorResponse"
+        data:
+          $ref: "#/components/schemas/Product"
+    UpdateProductRequest:
+      $ref: "#/components/schemas/Product"
+    UpdateProductResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        error:
+          $ref: "#/components/schemas/ErrorResponse"
+    Product:
+      type: object
+      required:
+        - name
+        - description
+        - details
+      properties:
+        product_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        rating:
+          type: number
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDetail"
+    ProductDetail:
+      type: object
+      required:
+        - stock
+        - price
+      properties:
+        variety_id:
+          type: integer
+        variant:
+          type: string
+        stock:
+          type: integer
+        price:
+          type: number
     ErrorResponse:
       type: object
       required:

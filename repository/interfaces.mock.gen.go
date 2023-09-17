@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	model "github.com/ProductsAPI/model"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -34,17 +35,32 @@ func (m *MockRepositoryInterface) EXPECT() *MockRepositoryInterfaceMockRecorder 
 	return m.recorder
 }
 
-// GetTestById mocks base method.
-func (m *MockRepositoryInterface) GetTestById(ctx context.Context, input GetTestByIdInput) (GetTestByIdOutput, error) {
+// GetProductByProductID mocks base method.
+func (m *MockRepositoryInterface) GetProductByProductID(ctx context.Context, productID int) (model.Product, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTestById", ctx, input)
-	ret0, _ := ret[0].(GetTestByIdOutput)
+	ret := m.ctrl.Call(m, "GetProductByProductID", ctx, productID)
+	ret0, _ := ret[0].(model.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetTestById indicates an expected call of GetTestById.
-func (mr *MockRepositoryInterfaceMockRecorder) GetTestById(ctx, input interface{}) *gomock.Call {
+// GetProductByProductID indicates an expected call of GetProductByProductID.
+func (mr *MockRepositoryInterfaceMockRecorder) GetProductByProductID(ctx, productID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTestById", reflect.TypeOf((*MockRepositoryInterface)(nil).GetTestById), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductByProductID", reflect.TypeOf((*MockRepositoryInterface)(nil).GetProductByProductID), ctx, productID)
+}
+
+// GetProductVarietiesByProductID mocks base method.
+func (m *MockRepositoryInterface) GetProductVarietiesByProductID(ctx context.Context, productID int) ([]model.ProductVariety, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProductVarietiesByProductID", ctx, productID)
+	ret0, _ := ret[0].([]model.ProductVariety)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProductVarietiesByProductID indicates an expected call of GetProductVarietiesByProductID.
+func (mr *MockRepositoryInterfaceMockRecorder) GetProductVarietiesByProductID(ctx, productID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductVarietiesByProductID", reflect.TypeOf((*MockRepositoryInterface)(nil).GetProductVarietiesByProductID), ctx, productID)
 }

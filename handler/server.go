@@ -1,15 +1,17 @@
 package handler
 
-import "github.com/ProductsAPI/repository"
+import "github.com/ProductsAPI/usecase"
 
 type Server struct {
-	Repository repository.RepositoryInterface
+	Usecase usecase.UsecaseInterface
 }
 
 type NewServerOptions struct {
-	Repository repository.RepositoryInterface
+	Usecase usecase.UsecaseInterface
 }
 
 func NewServer(opts NewServerOptions) *Server {
-	return &Server{}
+	return &Server{
+		Usecase: opts.Usecase,
+	}
 }

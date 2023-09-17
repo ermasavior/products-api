@@ -6,6 +6,7 @@ import (
 	"github.com/ProductsAPI/generated"
 	"github.com/ProductsAPI/handler"
 	"github.com/ProductsAPI/repository"
+	"github.com/ProductsAPI/usecase"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,8 +25,12 @@ func newServer() *handler.Server {
 	var repo repository.RepositoryInterface = repository.NewRepository(repository.NewRepositoryOptions{
 		Dsn: dbDsn,
 	})
-	opts := handler.NewServerOptions{
+
+	var uc usecase.UsecaseInterface = usecase.NewUsecase(usecase.NewUsecaseOptions{
 		Repository: repo,
-	}
-	return handler.NewServer(opts)
+	})
+
+	return handler.NewServer(handler.NewServerOptions{
+		Usecase: uc,
+	})
 }
