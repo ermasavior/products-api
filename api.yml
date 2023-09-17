@@ -25,12 +25,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetProductResponse"
-        "404":
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetProductResponse"
         "500":
           description: Internal server error
           content:
@@ -66,6 +60,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateProductResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProductResponse"
         "500":
           description: Internal server error
           content:

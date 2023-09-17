@@ -375,6 +375,44 @@ func TestUpdateProduct(t *testing.T) {
 			},
 		},
 		{
+			name: "failed - product id is not found",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
+					Return(model.ValidationProductResult{
+						IsValid: true,
+					}, model.ErrorProductNotFound).Times(1)
+			},
+			wantStatusCode: http.StatusNotFound,
+			wantRes: generated.UpdateProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: model.ErrorProductNotFound.Error(),
+				},
+			},
+		},
+		{
+			name: "failed - product cannot be emptied",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
+					Return(model.ValidationProductResult{
+						IsValid: true,
+					}, model.ErrorEmptyProductDetails).Times(1)
+			},
+			wantStatusCode: http.StatusBadRequest,
+			wantRes: generated.UpdateProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: model.ErrorEmptyProductDetails.Error(),
+				},
+			},
+		},
+		{
 			name: "failed - error validation",
 			args: args{
 				req: validReq,

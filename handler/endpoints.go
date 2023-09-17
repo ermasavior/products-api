@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ProductsAPI/generated"
+	"github.com/ProductsAPI/model"
 	"github.com/bytedance/sonic"
 	"github.com/labstack/echo/v4"
 )
@@ -120,6 +121,21 @@ func (s *Server) UpdateProduct(c echo.Context, productID int) error {
 	productInput := buildProductInput(productReq)
 
 	validateRes, err := s.Usecase.UpdateProduct(ctx, productInput)
+
+	if err == model.ErrorProductNotFound {
+		result.Error = &generated.ErrorResponse{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusNotFound, result)
+	}
+
+	if err == model.ErrorEmptyProductDetails {
+		result.Error = &generated.ErrorResponse{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusBadRequest, result)
+	}
+
 	if err != nil {
 		result.Error = &generated.ErrorResponse{
 			Message: err.Error(),
