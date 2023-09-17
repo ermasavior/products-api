@@ -25,6 +25,14 @@ func (s *Server) GetProduct(c echo.Context, productID int) error {
 	ctx := c.Request().Context()
 
 	product, err := s.Usecase.GetProduct(ctx, productID)
+
+	if err == model.ErrorProductNotFound {
+		result.Error = &generated.ErrorResponse{
+			Message: model.ErrorProductNotFound.Error(),
+		}
+		return c.JSON(http.StatusNotFound, result)
+	}
+
 	if err != nil {
 		result.Error = &generated.ErrorResponse{
 			Message: err.Error(),

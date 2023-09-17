@@ -21,7 +21,7 @@ func (r *Repository) GetProductByProductID(ctx context.Context, productID int) (
 		Scan(&result.ProductID, &result.Name, &result.Description, &result.Rating)
 
 	if err == sql.ErrNoRows {
-		return result, nil
+		return result, model.ErrorProductNotFound
 	}
 
 	if err != nil {

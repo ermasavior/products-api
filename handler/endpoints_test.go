@@ -77,6 +77,23 @@ func TestGetProduct(t *testing.T) {
 			},
 		},
 		{
+			name: "failed - product id is not found",
+			args: args{
+				productID: productID,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().GetProduct(gomock.Any(), productID).
+					Return(model.Product{}, model.ErrorProductNotFound).Times(1)
+			},
+			wantStatusCode: http.StatusNotFound,
+			wantRes: generated.GetProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: model.ErrorProductNotFound.Error(),
+				},
+			},
+		},
+		{
 			name: "failed - usecase returns error",
 			args: args{
 				productID: productID,
