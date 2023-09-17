@@ -56,6 +56,50 @@ func (s *Server) GetProduct(c echo.Context, productID int) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+func (s *Server) GetAllProducts(c echo.Context) error {
+	var (
+		result generated.GetAllProductsResponse
+	)
+
+	ctx := c.Request().Context()
+	products, err := s.Usecase.GetAllProducts(ctx)
+	if err != nil {
+		result.Error = &generated.ErrorResponse{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, result)
+	}
+
+	productList := make([]generated.Product, 0, len(products))
+	for _, p := range products {
+		detailsRes := make([]generated.ProductDetail, 0, len(p.Details))
+		for _, p := range p.Details {
+			varietyID, variant := p.VarietyID, p.Variant
+			detailsRes = append(detailsRes, generated.ProductDetail{
+				VarietyId: &varietyID,
+				Variant:   &variant,
+				Price:     p.Price,
+				Stock:     p.Stock,
+			})
+		}
+
+		productList = append(productList, generated.Product{
+			ProductId:   &p.ProductID,
+			Name:        p.Name,
+			Description: p.Description,
+			Rating:      &p.Rating,
+			Details:     detailsRes,
+		})
+	}
+
+	result = generated.GetAllProductsResponse{
+		Success: true,
+		Data:    &productList,
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 func (s *Server) AddProduct(c echo.Context) error {
 	var (
 		result     generated.AddProductResponse

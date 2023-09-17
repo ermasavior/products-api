@@ -15,6 +15,11 @@ const (
 		WHERE product_id = $1
 	`
 
+	queryGetAllProducts = `
+		SELECT product_id, name, description, rating
+		FROM products
+	`
+
 	queryInsertNewProduct = `
 		INSERT INTO products(name, description, rating)
 		VALUES($1, $2, $3)

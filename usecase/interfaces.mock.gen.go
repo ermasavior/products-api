@@ -65,6 +65,21 @@ func (mr *MockUsecaseInterfaceMockRecorder) DeleteProduct(ctx, productID interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockUsecaseInterface)(nil).DeleteProduct), ctx, productID)
 }
 
+// GetAllProducts mocks base method.
+func (m *MockUsecaseInterface) GetAllProducts(ctx context.Context) ([]model.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllProducts", ctx)
+	ret0, _ := ret[0].([]model.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllProducts indicates an expected call of GetAllProducts.
+func (mr *MockUsecaseInterfaceMockRecorder) GetAllProducts(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllProducts", reflect.TypeOf((*MockUsecaseInterface)(nil).GetAllProducts), ctx)
+}
+
 // GetProduct mocks base method.
 func (m *MockUsecaseInterface) GetProduct(ctx context.Context, productID int) (model.Product, error) {
 	m.ctrl.T.Helper()

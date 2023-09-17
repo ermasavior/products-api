@@ -30,6 +30,33 @@ func (u *Usecase) GetProduct(ctx context.Context, productID int) (model.Product,
 	return product, nil
 }
 
+func (u *Usecase) GetAllProducts(ctx context.Context) ([]model.Product, error) {
+	var (
+		products []model.Product
+		err      error
+	)
+
+	products, err = u.Repository.GetAllProducts(ctx)
+	if err != nil {
+		return products, err
+	}
+
+	for i := range products {
+		productDetails, err := u.Repository.GetProductVarietiesByProductID(ctx, products[i].ProductID)
+		if err != nil {
+			return products, err
+		}
+
+		products[i].Details = productDetails
+	}
+
+	if err != nil {
+		return products, err
+	}
+
+	return products, nil
+}
+
 func (u *Usecase) AddProduct(ctx context.Context, product model.Product) (int, model.ValidationProductResult, error) {
 	var (
 		productID   int

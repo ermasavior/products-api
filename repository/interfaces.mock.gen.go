@@ -65,6 +65,21 @@ func (mr *MockRepositoryInterfaceMockRecorder) DeleteProductVariety(ctx, variety
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProductVariety", reflect.TypeOf((*MockRepositoryInterface)(nil).DeleteProductVariety), ctx, variety, tx)
 }
 
+// GetAllProducts mocks base method.
+func (m *MockRepositoryInterface) GetAllProducts(ctx context.Context) ([]model.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllProducts", ctx)
+	ret0, _ := ret[0].([]model.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllProducts indicates an expected call of GetAllProducts.
+func (mr *MockRepositoryInterfaceMockRecorder) GetAllProducts(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllProducts", reflect.TypeOf((*MockRepositoryInterface)(nil).GetAllProducts), ctx)
+}
+
 // GetDatabase mocks base method.
 func (m *MockRepositoryInterface) GetDatabase() *sql.DB {
 	m.ctrl.T.Helper()

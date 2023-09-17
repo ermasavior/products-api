@@ -13,6 +13,7 @@ type RepositoryInterface interface {
 
 	GetProductByProductID(ctx context.Context, productID int) (model.Product, error)
 	GetProductVarietiesByProductID(ctx context.Context, productID int) ([]model.ProductVariety, error)
+	GetAllProducts(ctx context.Context) ([]model.Product, error)
 
 	InsertProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) (int, error)
 	InsertProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error

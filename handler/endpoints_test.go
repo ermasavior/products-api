@@ -587,3 +587,106 @@ func TestDeleteProduct(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAllProducts(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUC := usecase.NewMockUsecaseInterface(ctrl)
+
+	var (
+		productID   = 1
+		name        = "Dummy"
+		description = "Test description"
+		rating      = float32(4.5)
+		varietyID   = 999
+		variant     = ""
+		price       = float32(10000)
+		stock       = 10
+
+		method, path = http.MethodGet, "/products"
+	)
+
+	tests := []struct {
+		name           string
+		mockFunc       func()
+		wantStatusCode int
+		wantRes        generated.GetAllProductsResponse
+	}{
+		{
+			name: "failed - usecase returns error",
+			mockFunc: func() {
+				mockUC.EXPECT().GetAllProducts(gomock.Any()).
+					Return([]model.Product{}, errors.New("error usecase")).Times(1)
+			},
+			wantStatusCode: http.StatusInternalServerError,
+			wantRes: generated.GetAllProductsResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: "error usecase",
+				},
+			},
+		},
+		{
+			name: "success",
+			mockFunc: func() {
+				mockUC.EXPECT().GetAllProducts(gomock.Any()).
+					Return([]model.Product{
+						{
+							ProductID:   productID,
+							Name:        name,
+							Description: description,
+							Rating:      rating,
+							Details: []model.ProductVariety{
+								{
+									VarietyID: varietyID,
+									Variant:   variant,
+									Price:     price,
+									Stock:     stock,
+								},
+							},
+						},
+					}, nil).Times(1)
+			},
+			wantStatusCode: http.StatusOK,
+			wantRes: generated.GetAllProductsResponse{
+				Success: true,
+				Data: &[]generated.Product{
+					{
+						ProductId:   &productID,
+						Name:        name,
+						Description: description,
+						Rating:      &rating,
+						Details: []generated.ProductDetail{
+							{
+								VarietyId: &varietyID,
+								Variant:   &variant,
+								Price:     price,
+								Stock:     stock,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := Server{
+				Usecase: mockUC,
+			}
+
+			if tt.mockFunc != nil {
+				tt.mockFunc()
+			}
+
+			rec, c := initHTTPCall(method, path)
+			s.GetAllProducts(c)
+
+			var got generated.GetAllProductsResponse
+			sonic.Unmarshal(rec.Body.Bytes(), &got)
+
+			assert.EqualValues(t, tt.wantStatusCode, rec.Code)
+			assert.EqualValues(t, tt.wantRes, got)
+		})
+	}
+}

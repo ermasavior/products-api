@@ -60,6 +60,35 @@ func (r *Repository) GetProductVarietiesByProductID(ctx context.Context, product
 	return result, nil
 }
 
+func (r *Repository) GetAllProducts(ctx context.Context) ([]model.Product, error) {
+	var (
+		result []model.Product
+	)
+
+	rows, err := r.Db.QueryContext(ctx, queryGetAllProducts)
+	if rows == nil {
+		return result, nil
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var row model.Product
+
+		err := rows.Scan(&row.ProductID, &row.Name, &row.Description, &row.Rating)
+		if err != nil {
+			return []model.Product{}, err
+		}
+
+		result = append(result, row)
+	}
+
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func (r *Repository) InsertProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) (int, error) {
 	var id int
 
