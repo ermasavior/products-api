@@ -1,5 +1,25 @@
 # Products API
 
+Simple Products API Service made in Golang. This service serves product data which includes:
+
+- Basic product data (name, description, rating)
+- Product stock and price
+- Product variety
+
+## Data Diagram
+
+![Data Diagram](products-api.diagram.png)
+
+## API
+
+This backend service serves the functionalities below:
+
+1. Get all products
+2. Get product by ID
+3. Create new product
+4. Update product by ID
+5. Delete product by ID
+
 ## Requirements
 
 1. [Golang](https://golang.org/doc/install) version 1.19
@@ -53,3 +73,13 @@ To run test, run the following command:
 ```
 make test
 ```
+
+## API Contract
+
+Please find the contract in the [Postman Collection](Products-API.postman_collection.json)
+
+## Author
+
+Erma Safira Nurmasyita
+
+erma.safira.n@gmail.com
