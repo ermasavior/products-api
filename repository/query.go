@@ -54,4 +54,9 @@ const (
 		WHERE
 			variety_id = $1 AND product_id = $2
 	`
+
+	queryDeleteProduct = `
+		DELETE FROM products
+		WHERE product_id = $1
+	`
 )

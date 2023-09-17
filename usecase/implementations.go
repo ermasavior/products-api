@@ -174,3 +174,31 @@ func (u *Usecase) UpdateProduct(ctx context.Context, input model.Product) (model
 
 	return validateRes, nil
 }
+
+func (u *Usecase) DeleteProduct(ctx context.Context, productID int) error {
+	varieties, err := u.Repository.GetProductVarietiesByProductID(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	err = sqlwrapper.WithTransaction(ctx, u.Repository.GetDatabase(), func(tx sqlwrapper.Transaction) error {
+		var errTx error
+
+		for _, v := range varieties {
+			v.ProductID = productID
+			errTx = u.Repository.DeleteProductVariety(ctx, v, tx)
+			if errTx != nil {
+				return errTx
+			}
+		}
+
+		err = u.Repository.DeleteProduct(ctx, productID, tx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return nil
+}

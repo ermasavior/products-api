@@ -65,13 +65,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetProductResponse"
+                $ref: "#/components/schemas/UpdateProductResponse"
         "500":
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateProductResponse"
+    delete:
+      summary: Delete product data
+      operationId: deleteProduct
+      parameters:
+        - in: path
+          name: productID
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the product
+      responses:
+        "200":
+          description: Delete product response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProductResponse"
+        "400":
+          description: Invalid params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProductResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteProductResponse"
   /products:
     post:
       summary: Add a new product
@@ -160,6 +189,15 @@ components:
           $ref: "#/components/schemas/ErrorResponse"
         validation:
           $ref: "#/components/schemas/ValidationProductResult"
+    DeleteProductResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        error:
+          $ref: "#/components/schemas/ErrorResponse"
     Product:
       type: object
       required:

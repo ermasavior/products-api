@@ -117,3 +117,12 @@ func (r *Repository) DeleteProductVariety(ctx context.Context, variety model.Pro
 
 	return nil
 }
+
+func (r *Repository) DeleteProduct(ctx context.Context, productID int, tx sqlwrapper.Transaction) error {
+	_, err := tx.ExecContext(ctx, queryDeleteProduct, productID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -17,7 +17,7 @@ func (s *Server) GetProduct(c echo.Context, productID int) error {
 
 	if productID <= 0 {
 		result.Error = &generated.ErrorResponse{
-			Message: ErrorInvalidProductID,
+			Message: model.ErrorInvalidProductID.Error(),
 		}
 		return c.JSON(http.StatusBadRequest, result)
 	}
@@ -107,7 +107,7 @@ func (s *Server) UpdateProduct(c echo.Context, productID int) error {
 
 	if productID <= 0 {
 		result.Error = &generated.ErrorResponse{
-			Message: ErrorInvalidProductID,
+			Message: model.ErrorInvalidProductID.Error(),
 		}
 		return c.JSON(http.StatusBadRequest, result)
 	}
@@ -160,6 +160,34 @@ func (s *Server) UpdateProduct(c echo.Context, productID int) error {
 	}
 
 	result = generated.UpdateProductResponse{
+		Success: true,
+	}
+	return c.JSON(http.StatusOK, result)
+}
+
+func (s *Server) DeleteProduct(c echo.Context, productID int) error {
+	var (
+		result generated.DeleteProductResponse
+	)
+
+	if productID <= 0 {
+		result.Error = &generated.ErrorResponse{
+			Message: model.ErrorInvalidProductID.Error(),
+		}
+		return c.JSON(http.StatusBadRequest, result)
+	}
+
+	ctx := c.Request().Context()
+	err := s.Usecase.DeleteProduct(ctx, productID)
+
+	if err != nil {
+		result.Error = &generated.ErrorResponse{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, result)
+	}
+
+	result = generated.DeleteProductResponse{
 		Success: true,
 	}
 	return c.JSON(http.StatusOK, result)

@@ -19,5 +19,7 @@ type RepositoryInterface interface {
 
 	UpdateProduct(ctx context.Context, product model.Product, tx sqlwrapper.Transaction) error
 	UpdateProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error
+
+	DeleteProduct(ctx context.Context, productID int, tx sqlwrapper.Transaction) error
 	DeleteProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error
 }

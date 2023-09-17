@@ -37,6 +37,20 @@ func (m *MockRepositoryInterface) EXPECT() *MockRepositoryInterfaceMockRecorder 
 	return m.recorder
 }
 
+// DeleteProduct mocks base method.
+func (m *MockRepositoryInterface) DeleteProduct(ctx context.Context, productID int, tx sqlwrapper.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProduct", ctx, productID, tx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteProduct indicates an expected call of DeleteProduct.
+func (mr *MockRepositoryInterfaceMockRecorder) DeleteProduct(ctx, productID, tx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockRepositoryInterface)(nil).DeleteProduct), ctx, productID, tx)
+}
+
 // DeleteProductVariety mocks base method.
 func (m *MockRepositoryInterface) DeleteProductVariety(ctx context.Context, variety model.ProductVariety, tx sqlwrapper.Transaction) error {
 	m.ctrl.T.Helper()

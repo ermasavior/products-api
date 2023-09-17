@@ -72,7 +72,7 @@ func TestGetProduct(t *testing.T) {
 			wantRes: generated.GetProductResponse{
 				Success: false,
 				Error: &generated.ErrorResponse{
-					Message: ErrorInvalidProductID,
+					Message: model.ErrorInvalidProductID.Error(),
 				},
 			},
 		},
@@ -349,7 +349,8 @@ func TestUpdateProduct(t *testing.T) {
 	}
 
 	type args struct {
-		req generated.UpdateProductRequest
+		productID int
+		req       generated.UpdateProductRequest
 	}
 	tests := []struct {
 		name           string
@@ -361,7 +362,8 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				req: validReq,
+				productID: productID,
+				req:       validReq,
 			},
 			mockFunc: func() {
 				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
@@ -375,9 +377,24 @@ func TestUpdateProduct(t *testing.T) {
 			},
 		},
 		{
+			name: "failed - invalid product ID",
+			args: args{
+				productID: 0,
+				req:       validReq,
+			},
+			wantStatusCode: http.StatusBadRequest,
+			wantRes: generated.UpdateProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: model.ErrorInvalidProductID.Error(),
+				},
+			},
+		},
+		{
 			name: "failed - product id is not found",
 			args: args{
-				req: validReq,
+				productID: productID,
+				req:       validReq,
 			},
 			mockFunc: func() {
 				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
@@ -396,7 +413,8 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name: "failed - product cannot be emptied",
 			args: args{
-				req: validReq,
+				productID: productID,
+				req:       validReq,
 			},
 			mockFunc: func() {
 				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
@@ -415,7 +433,8 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name: "failed - error validation",
 			args: args{
-				req: validReq,
+				productID: productID,
+				req:       validReq,
 			},
 			mockFunc: func() {
 				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
@@ -443,7 +462,8 @@ func TestUpdateProduct(t *testing.T) {
 		{
 			name: "failed - error from usecase",
 			args: args{
-				req: validReq,
+				productID: productID,
+				req:       validReq,
 			},
 			mockFunc: func() {
 				mockUC.EXPECT().UpdateProduct(gomock.Any(), productInput).
@@ -470,9 +490,96 @@ func TestUpdateProduct(t *testing.T) {
 
 			rec, c := initHTTPCall(method, path)
 			c = buildHTTPRequestBody(c, method, path, tt.args.req)
-			s.UpdateProduct(c, productID)
+			s.UpdateProduct(c, tt.args.productID)
 
 			var got generated.UpdateProductResponse
+			sonic.Unmarshal(rec.Body.Bytes(), &got)
+
+			assert.EqualValues(t, tt.wantStatusCode, rec.Code)
+			assert.EqualValues(t, tt.wantRes, got)
+		})
+	}
+}
+
+func TestDeleteProduct(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUC := usecase.NewMockUsecaseInterface(ctrl)
+
+	var (
+		productID    = 1
+		method, path = http.MethodDelete, fmt.Sprintf("/products/%d", productID)
+	)
+
+	type args struct {
+		productID int
+	}
+	tests := []struct {
+		name           string
+		args           args
+		mockFunc       func()
+		wantStatusCode int
+		wantRes        generated.DeleteProductResponse
+	}{
+		{
+			name: "failed - invalid product ID",
+			args: args{
+				productID: 0,
+			},
+			wantStatusCode: http.StatusBadRequest,
+			wantRes: generated.DeleteProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: model.ErrorInvalidProductID.Error(),
+				},
+			},
+		},
+		{
+			name: "failed - usecase returns error",
+			args: args{
+				productID: productID,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().DeleteProduct(gomock.Any(), productID).
+					Return(errors.New("error usecase")).Times(1)
+			},
+			wantStatusCode: http.StatusInternalServerError,
+			wantRes: generated.DeleteProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: "error usecase",
+				},
+			},
+		},
+		{
+			name: "success",
+			args: args{
+				productID: productID,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().DeleteProduct(gomock.Any(), productID).
+					Return(nil).Times(1)
+			},
+			wantStatusCode: http.StatusOK,
+			wantRes: generated.DeleteProductResponse{
+				Success: true,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := Server{
+				Usecase: mockUC,
+			}
+
+			if tt.mockFunc != nil {
+				tt.mockFunc()
+			}
+
+			rec, c := initHTTPCall(method, path)
+			s.DeleteProduct(c, tt.args.productID)
+
+			var got generated.DeleteProductResponse
 			sonic.Unmarshal(rec.Body.Bytes(), &got)
 
 			assert.EqualValues(t, tt.wantStatusCode, rec.Code)
