@@ -112,11 +112,13 @@ components:
       properties:
         success:
           type: boolean
+        product_id:
+          type: integer
         error:
           $ref: "#/components/schemas/ErrorResponse"
         validation:
-          $ref: "#/components/schemas/ValidationResult"
-    ValidationResult:
+          $ref: "#/components/schemas/ValidationProductResult"
+    ValidationProductResult:
       type: object
       properties:
         name:
@@ -126,12 +128,14 @@ components:
         rating:
           type: string
         details:
-          type: object
-          properties:
-            price:
-              type: string
-            stock:
-              type: string
+          $ref: "#/components/schemas/ValidationProductDetailResult"
+    ValidationProductDetailResult:
+      type: object
+      properties:
+        price:
+          type: string
+        stock:
+          type: string
     GetProductResponse:
       type: object
       required:

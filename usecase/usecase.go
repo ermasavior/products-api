@@ -1,9 +1,13 @@
 package usecase
 
-import "github.com/ProductsAPI/repository"
+import (
+	"github.com/ProductsAPI/repository"
+	"github.com/go-playground/validator/v10"
+)
 
 type Usecase struct {
 	Repository repository.RepositoryInterface
+	validate   *validator.Validate
 }
 
 type NewUsecaseOptions struct {
@@ -13,5 +17,6 @@ type NewUsecaseOptions struct {
 func NewUsecase(opts NewUsecaseOptions) *Usecase {
 	return &Usecase{
 		Repository: opts.Repository,
+		validate:   initValidator(),
 	}
 }

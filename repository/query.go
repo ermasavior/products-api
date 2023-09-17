@@ -14,4 +14,15 @@ const (
 		FROM product_varieties
 		WHERE product_id = $1
 	`
+
+	queryInsertNewProduct = `
+		INSERT INTO products(name, description, rating)
+		VALUES($1, $2, $3)
+		RETURNING product_id
+	`
+
+	queryInsertNewProductVariety = `
+		INSERT INTO product_varieties(product_id, variant, price, stock)
+		VALUES($1, $2, $3, $4)
+	`
 )

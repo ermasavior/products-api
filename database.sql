@@ -1,6 +1,6 @@
 CREATE TABLE products (
 	product_id serial PRIMARY KEY,
-	name VARCHAR ( 200 ) UNIQUE NOT NULL,
+	name VARCHAR ( 200 ) NOT NULL,
 	description TEXT,
   rating FLOAT
 );

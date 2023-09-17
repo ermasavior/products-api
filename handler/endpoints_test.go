@@ -156,3 +156,144 @@ func TestGetProduct(t *testing.T) {
 		})
 	}
 }
+
+func TestAddProduct(t *testing.T) {
+	method, path := http.MethodPost, "/products"
+
+	ctrl := gomock.NewController(t)
+	mockUC := usecase.NewMockUsecaseInterface(ctrl)
+
+	var (
+		productID   = 1
+		name        = "Dummy"
+		description = "Test description"
+		rating      = float32(4.5)
+		variant     = ""
+		price       = float32(10000)
+		stock       = 10
+
+		invalidMsg = "invalid msg"
+		emptyStr   = ""
+	)
+
+	validReq := generated.Product{
+		Name:        name,
+		Description: description,
+		Rating:      &rating,
+		Details: []generated.ProductDetail{
+			{
+				Variant: &variant,
+				Price:   price,
+				Stock:   stock,
+			},
+		},
+	}
+
+	productInput := model.Product{
+		Name:        name,
+		Description: description,
+		Rating:      rating,
+		Details: []model.ProductVariety{
+			{
+				Variant: variant,
+				Price:   price,
+				Stock:   stock,
+			},
+		},
+	}
+
+	type args struct {
+		req generated.AddProductRequest
+	}
+	tests := []struct {
+		name           string
+		args           args
+		mockFunc       func()
+		wantStatusCode int
+		wantRes        generated.AddProductResponse
+	}{
+		{
+			name: "success",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().AddProduct(gomock.Any(), productInput).
+					Return(productID, model.ValidationProductResult{
+						IsValid: true,
+					}, nil).Times(1)
+			},
+			wantStatusCode: http.StatusOK,
+			wantRes: generated.AddProductResponse{
+				Success:   true,
+				ProductId: &productID,
+			},
+		},
+		{
+			name: "failed - error validation",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().AddProduct(gomock.Any(), productInput).
+					Return(0, model.ValidationProductResult{
+						IsValid: false,
+						Name:    invalidMsg,
+						Details: &model.ValidationProductDetailResult{
+							Stock: invalidMsg,
+						},
+					}, nil).Times(1)
+			},
+			wantStatusCode: http.StatusBadRequest,
+			wantRes: generated.AddProductResponse{
+				Success: false,
+				Validation: &generated.ValidationProductResult{
+					Name:        &invalidMsg,
+					Description: &emptyStr,
+					Details: &generated.ValidationProductDetailResult{
+						Stock: &invalidMsg,
+						Price: &emptyStr,
+					},
+				},
+			},
+		},
+		{
+			name: "failed - error from usecase",
+			args: args{
+				req: validReq,
+			},
+			mockFunc: func() {
+				mockUC.EXPECT().AddProduct(gomock.Any(), productInput).
+					Return(0, model.ValidationProductResult{}, errors.New("error usecase")).Times(1)
+			},
+			wantStatusCode: http.StatusInternalServerError,
+			wantRes: generated.AddProductResponse{
+				Success: false,
+				Error: &generated.ErrorResponse{
+					Message: "error usecase",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := Server{
+				Usecase: mockUC,
+			}
+			if tt.mockFunc != nil {
+				tt.mockFunc()
+			}
+
+			rec, c := initHTTPCall(method, path)
+			c = buildHTTPRequestBody(c, method, path, tt.args.req)
+			s.AddProduct(c)
+
+			var got generated.AddProductResponse
+			sonic.Unmarshal(rec.Body.Bytes(), &got)
+
+			assert.EqualValues(t, tt.wantStatusCode, rec.Code)
+			assert.EqualValues(t, tt.wantRes, got)
+		})
+	}
+}

@@ -35,6 +35,22 @@ func (m *MockUsecaseInterface) EXPECT() *MockUsecaseInterfaceMockRecorder {
 	return m.recorder
 }
 
+// AddProduct mocks base method.
+func (m *MockUsecaseInterface) AddProduct(ctx context.Context, product model.Product) (int, model.ValidationProductResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddProduct", ctx, product)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(model.ValidationProductResult)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// AddProduct indicates an expected call of AddProduct.
+func (mr *MockUsecaseInterfaceMockRecorder) AddProduct(ctx, product interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProduct", reflect.TypeOf((*MockUsecaseInterface)(nil).AddProduct), ctx, product)
+}
+
 // GetProduct mocks base method.
 func (m *MockUsecaseInterface) GetProduct(ctx context.Context, productID int) (model.Product, error) {
 	m.ctrl.T.Helper()
